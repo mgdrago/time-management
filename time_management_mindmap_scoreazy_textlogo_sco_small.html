@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Time Management → Interactive Mind Map</title>
+
+<!-- Brand fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Montserrat:wght@400;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --brand-teal: #008080;
+  --brand-black: #000101;
+  --brand-gray: #b4b4b4;
+  --brand-white: #ffffff;
+
+  --bg: #ffffff;
+  --text: var(--brand-black);
+  --muted: #475569; /* soft slate */
+  --panel: #ffffff;
+  --panel-border: #e5e7eb;
+  --shadow: 0 8px 24px rgba(2, 36, 39, 0.07);
+  --accent: var(--brand-teal);
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0; color: var(--text); background: var(--bg);
+  font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial;
+}
+
+/* Soft gradient header */
+.header-wrap {
+  background: radial-gradient(80% 60% at 10% -10%, rgba(0,128,128,0.12), transparent),
+              radial-gradient(70% 60% at 90% 0%, rgba(180,180,180,0.12), transparent);
+  border-bottom: 1px solid var(--panel-border);
+}
+.container { max-width: 1100px; margin: 0 auto; padding: 24px 20px; }
+.header { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+h1 {
+  margin: 0; letter-spacing:.2px; color: var(--brand-black);
+  font-family: 'Oswald', sans-serif; font-weight: 700; display:flex; align-items:center; gap:12px;
+}
+.logo {
+  width: 42px; height: 42px; border-radius: 12px;
+  background: conic-gradient(from 90deg, #79caca, #b4b4b4, #79caca);
+  display:flex; align-items:center; justify-content:center;
+  box-shadow: 0 8px 18px rgba(0,128,128,.18);
+}
+.logo span { font-size: 22px; color: var(--brand-white); }
+
+.badges { display:flex; gap:8px; flex-wrap: wrap; }
+.badge {
+  background: #f0fdfa; border: 1px solid #ccfbf1; color:#065f46; padding:6px 10px;
+  border-radius: 999px; font-size:12px; font-weight:600; box-shadow: var(--shadow);
+  font-family: 'Montserrat', sans-serif;
+}
+
+.panel {
+  background: var(--panel); border: 1px solid var(--panel-border); border-radius: 16px; padding: 14px;
+  box-shadow: var(--shadow);
+}
+
+.toolbar { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+input[type="search"] {
+  background:#fff; border:1px solid var(--panel-border); color:var(--text);
+  padding:10px 12px; border-radius:12px; min-width:280px; outline:none;
+  transition: box-shadow .2s, border-color .2s; font-family: 'Poppins', sans-serif;
+}
+input[type="search"]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,128,128,.15); }
+button {
+  background:#fff; color:var(--text); border:1px solid var(--panel-border);
+  padding:10px 12px; border-radius:12px; cursor:pointer; transition: border-color .2s, transform .06s;
+  font-family: 'Montserrat', sans-serif; font-weight:600;
+}
+button:hover { border-color: var(--accent); }
+
+.filters { display:flex; flex-wrap:wrap; gap:8px; }
+.chip { background:#f8fafc; border:1px dashed var(--panel-border); padding:6px 10px; border-radius:999px; font-size:12px; cursor:pointer; user-select:none; transition: border-color .2s, background .2s; font-family: 'Montserrat', sans-serif; }
+.chip.active { background: #e6fffa; border-color:#99f6e4; }
+
+.breadcrumb { margin-top: 10px; color: var(--muted); font-size: 14px; font-family: 'Montserrat', sans-serif; }
+.breadcrumb .sep { opacity:.5; padding:0 6px; }
+
+/* Tree */
+.tree { list-style:none; padding-left:0; }
+.tree details { border-left:2px dashed #e2e8f0; margin-left: 12px; padding-left: 14px; }
+.tree summary {
+  list-style:none; cursor:pointer; padding:10px 12px; margin:10px 0;
+  background: #ffffff;
+  border:1px solid var(--panel-border); border-radius:12px; position:relative;
+  transition: border-color .2s, transform .08s, background .2s;
+  display:flex; align-items:center; gap:10px;
+  font-family: 'Montserrat', sans-serif; font-weight:600;
+}
+.tree summary:hover { border-color: var(--accent); background: #f0fdfa; }
+.tree summary::after {
+  content:"▸"; position:absolute; right:10px; top:50%; transform: translateY(-50%) rotate(0deg);
+  transition: transform .2s ease; opacity:.6;
+}
+details[open] > summary::after { transform: translateY(-50%) rotate(90deg); }
+
+.icon { width:22px; height:22px; display:inline-flex; align-items:center; justify-content:center; border-radius:8px; background:#e6fffb; border:1px solid #ccfbf1; box-shadow: inset 0 0 12px rgba(0,128,128,.08); }
+.icon.school::before { content:"🏫"; }
+.icon.college::before { content:"🎓"; }
+.icon.hindi::before { content:"🇮🇳"; }
+.icon.english::before { content:"🇬🇧"; }
+.icon.folder::before { content:"🗂️"; }
+
+.leaf a {
+  display:inline-flex; align-items:center; gap:8px;
+  padding:8px 10px; margin:6px 0;
+  border:1px solid var(--panel-border); border-radius:10px; text-decoration:none; color:var(--text);
+  transition: transform .08s, border-color .2s, box-shadow .2s, background .2s;
+  background: #fff; font-family: 'Poppins', sans-serif;
+}
+.leaf a .dot {
+  width:8px; height:8px; border-radius:999px; background: var(--accent); box-shadow: 0 0 8px rgba(0,128,128,.35);
+}
+.leaf a:hover { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(0,128,128,.10); transform: translateY(-1px); background: #f8ffff; }
+
+/* Canvas for scientific & math symbols */
+canvas#symbols { position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: .25; }
+
+footer { margin-top: 28px; color: var(--muted); font-size: 12px; font-family: 'Poppins', sans-serif; }
+
+@media (max-width: 640px) {
+  .toolbar { flex-direction: column; align-items: stretch; }
+  input[type="search"] { width: 100%; min-width: 0; }
+}
+
+
+
+
+
+
+.logo-text {
+  font-size: 32px;
+  font-family: 'Oswald', sans-serif;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+}
+.logo-text .sco {
+  color: #000000;
+}
+.logo-text .rest {
+  color: #008080;
+}
+
+</style>
+</head>
+<body>
+
+<div class="header-wrap">
+  <div class="container header">
+    <h1><span class="logo-text"><span class="sco">sco</span><span class="rest">reazy</span></span></h1>
+    <div class="badges">
+      <span class="badge">Student Edition</span>
+      <span class="badge">English 🇬🇧 / Hindi 🇮🇳</span>
+      <span class="badge">Scoreazy Style</span>
+    </div>
+  </div>
+</div>
+
+<canvas id="symbols"></canvas>
+
+<div class="container">
+  <div class="breadcrumb" id="crumbs">Time Management <span class="sep">→</span> Students</div>
+
+  <div class="panel toolbar" style="margin-top:12px">
+    <input id="q" type="search" placeholder="Search titles… e.g., ‘Hindi’, ‘College’, ‘Pomodoro’">
+    <div class="filters">
+      <span class="chip" data-filter="school">🏫 School</span>
+      <span class="chip" data-filter="college">🎓 College</span>
+      <span class="chip" data-filter="english">🇬🇧 English</span>
+      <span class="chip" data-filter="hindi">🇮🇳 Hindi</span>
+      <span class="chip" id="clearFilters">Clear filters</span>
+    </div>
+    <div style="flex:1"></div>
+    <button id="expandAll" title="Open all">Expand all</button>
+    <button id="collapseAll" title="Close all">Collapse all</button>
+    <button id="reset" title="Reset view">Reset</button>
+  </div>
+
+  <div class="panel">
+    <!-- Tree injected here -->
+    <ul class="tree"><li class="node students"><details><summary><span class="label">Students</span></summary><ul><li class="node students school"><details><summary><span class="label">School Students</span></summary><ul><li class="node students school english"><details open><summary><span class="label">English Videos</span></summary><ul><li class="leaf students school english"><a href="https://www.youtube.com/watch?v=KBH4c55NnIY" target="_blank" rel="noopener"><span class="dot"></span>Time Management for Kids | Character Education</a></li><li class="leaf students school english"><a href="https://www.youtube.com/watch?v=xetJws2l-kA" target="_blank" rel="noopener"><span class="dot"></span>Time Management :: for Middle Schoolers</a></li><li class="leaf students school english"><a href="https://www.youtube.com/watch?v=3KsCIsNMSf4" target="_blank" rel="noopener"><span class="dot"></span>Time Management For Kids: What Does It Look Like?</a></li><li class="leaf students school english"><a href="https://www.youtube.com/watch?v=otCwCjz0rlc" target="_blank" rel="noopener"><span class="dot"></span>Time Management Strategies for Middle School Kids</a></li><li class="leaf students school english"><a href="https://www.youtube.com/watch?v=nUwt9U0HBcU" target="_blank" rel="noopener"><span class="dot"></span>Organization and time management for middle schoolers</a></li><li class="leaf students school english"><a href="https://www.youtube.com/watch?v=BsLC5eIjcag" target="_blank" rel="noopener"><span class="dot"></span>How To Manage Your Time As A Student</a></li><li class="leaf students school english"><a href="https://www.youtube.com/watch?v=QL7vgCwtGzI" target="_blank" rel="noopener"><span class="dot"></span>The ULTIMATE Time Management System for Students</a></li><li class="leaf students school english"><a href="https://www.youtube.com/watch?v=rUO8Qvcs7cY" target="_blank" rel="noopener"><span class="dot"></span>Student Success – Time Management</a></li><li class="leaf students school english"><a href="https://www.youtube.com/playlist?list=PLTnjjdSlNvx2Xva7yDsm3VbmuZ7ya_1O-" target="_blank" rel="noopener"><span class="dot"></span>Study Skills – Time Management Module (Playlist)</a></li><li class="leaf students school english"><a href="https://www.youtube.com/watch?v=PEqpzvGdEKc" target="_blank" rel="noopener"><span class="dot"></span>10 Time Management Tips for Students</a></li></ul></details></li><li class="node students school hindi"><details open><summary><span class="label">Hindi Videos</span></summary><ul><li class="leaf students school hindi"><a href="https://www.youtube.com/watch?v=31LZeMC5l3o" target="_blank" rel="noopener"><span class="dot"></span>6 TIME MANAGEMENT Tips for STUDENTS &amp; WORKING PEOPLE!</a></li><li class="leaf students school hindi"><a href="https://www.youtube.com/watch?v=77w9zoENJso" target="_blank" rel="noopener"><span class="dot"></span>Top 8 Principles Of Time Management In Hindi</a></li><li class="leaf students school hindi"><a href="https://www.youtube.com/watch?v=uQZSeR4RmTU" target="_blank" rel="noopener"><span class="dot"></span>7 TIME MANAGEMENT Tips for STUDENTS &amp; WORKING PEOPLE!</a></li><li class="leaf students school hindi"><a href="https://www.youtube.com/watch?v=op_jwGT6Bvc" target="_blank" rel="noopener"><span class="dot"></span>Time management tips for students and working professionals (Hindi)</a></li><li class="leaf students school hindi"><a href="https://www.youtube.com/watch?v=YE6FjBtV43Y" target="_blank" rel="noopener"><span class="dot"></span>Time Management Tips for School Students in Hindi</a></li><li class="leaf students school hindi"><a href="https://www.youtube.com/watch?v=3dxRRoydZls" target="_blank" rel="noopener"><span class="dot"></span>Time Management During Exam Preparation | Hindi</a></li><li class="leaf students school hindi"><a href="https://www.youtube.com/watch?v=tpPAz4cF3eE" target="_blank" rel="noopener"><span class="dot"></span>How to Learn Time Management? [Hindi]</a></li><li class="leaf students school hindi"><a href="https://www.youtube.com/watch?v=Jk5x0qj-FQ0" target="_blank" rel="noopener"><span class="dot"></span>Student Life में Time Management कैसे करें</a></li><li class="leaf students school hindi"><a href="https://www.youtube.com/watch?v=k3G9iWb2QmE" target="_blank" rel="noopener"><span class="dot"></span>Time Management Tips for Class 10th &amp; 12th Students | Hindi</a></li><li class="leaf students school hindi"><a href="https://www.youtube.com/watch?v=WcxVDlZaT3Q" target="_blank" rel="noopener"><span class="dot"></span>Best Time Table for School Students | Hindi</a></li></ul></details></li></ul></details></li><li class="node students college"><details><summary><span class="label">College Students</span></summary><ul><li class="node students college english"><details open><summary><span class="label">English Videos</span></summary><ul><li class="leaf students college english"><a href="https://www.youtube.com/watch?v=2g_o-hRBeMA" target="_blank" rel="noopener"><span class="dot"></span>Time Management for College Students</a></li><li class="leaf students college english"><a href="https://www.youtube.com/watch?v=ALfG9w79hiM" target="_blank" rel="noopener"><span class="dot"></span>Tips for Time Management for College Students</a></li><li class="leaf students college english"><a href="https://www.youtube.com/watch?v=nAOOv2_lg60" target="_blank" rel="noopener"><span class="dot"></span>Time Management Tips for College Students (Boost Productivity)</a></li><li class="leaf students college english"><a href="https://www.youtube.com/watch?v=B1BwqZBy4Zs" target="_blank" rel="noopener"><span class="dot"></span>Time Management Techniques for University Students</a></li><li class="leaf students college english"><a href="https://www.youtube.com/watch?v=5gYxjm8y9v0" target="_blank" rel="noopener"><span class="dot"></span>Time Management Skills for College Students</a></li><li class="leaf students college english"><a href="https://www.youtube.com/watch?v=Stl_5YYJFn0" target="_blank" rel="noopener"><span class="dot"></span>Time Management for University Students | Arden</a></li><li class="leaf students college english"><a href="https://www.youtube.com/watch?v=vRSB1NWrSqI" target="_blank" rel="noopener"><span class="dot"></span>Time Management for Online Students</a></li><li class="leaf students college english"><a href="https://www.youtube.com/watch?v=2K7M1Tk2Q7U" target="_blank" rel="noopener"><span class="dot"></span>Managing Time in Online College Programs</a></li><li class="leaf students college english"><a href="https://www.youtube.com/watch?v=UEDu6w4KpD8" target="_blank" rel="noopener"><span class="dot"></span>Top 7 Time Management Tips for E-Learning</a></li><li class="leaf students college english"><a href="https://www.youtube.com/watch?v=h4uVZXuYfrk" target="_blank" rel="noopener"><span class="dot"></span>Grad School 101: Time Management</a></li><li class="leaf students college english"><a href="https://www.youtube.com/watch?v=H4Qub3dL49g" target="_blank" rel="noopener"><span class="dot"></span>Lecture – Time Management and Planning in Graduate School</a></li><li class="leaf students college english"><a href="https://www.youtube.com/watch?v=MRrk9SUpbZM" target="_blank" rel="noopener"><span class="dot"></span>How to MASTER Time Management in Grad School</a></li><li class="leaf students college english"><a href="https://www.youtube.com/watch?v=ZAc2eF-1b5Q" target="_blank" rel="noopener"><span class="dot"></span>PhD Time Management Strategies</a></li><li class="leaf students college english"><a href="https://www.youtube.com/watch?v=KM8Q3wYF9vY" target="_blank" rel="noopener"><span class="dot"></span>How to Manage Your Time as a Graduate Student</a></li><li class="leaf students college english"><a href="https://www.youtube.com/watch?v=EnCJGmS9l6Y" target="_blank" rel="noopener"><span class="dot"></span>Semester Planning for University Students</a></li><li class="leaf students college english"><a href="https://www.youtube.com/watch?v=8cR7sfQW8u4" target="_blank" rel="noopener"><span class="dot"></span>Weekly Planning for College Success</a></li><li class="leaf students college english"><a href="https://www.youtube.com/watch?v=zFJqFqTYC84" target="_blank" rel="noopener"><span class="dot"></span>Daily Routines of Successful University Students</a></li><li class="leaf students college english"><a href="https://www.youtube.com/watch?v=kqTL7Gr5oFg" target="_blank" rel="noopener"><span class="dot"></span>Using Google Calendar for College Students</a></li><li class="leaf students college english"><a href="https://www.youtube.com/watch?v=H7F3y_cHLmQ" target="_blank" rel="noopener"><span class="dot"></span>Prioritization Techniques for Students</a></li><li class="leaf students college english"><a href="https://www.youtube.com/watch?v=4x7MkLDGnu8" target="_blank" rel="noopener"><span class="dot"></span>Avoiding Procrastination in College</a></li></ul></details></li><li class="node students college hindi"><details open><summary><span class="label">Hindi Videos</span></summary><ul><li class="leaf students college hindi"><a href="https://www.youtube.com/watch?v=o-j5EDbjyPM" target="_blank" rel="noopener"><span class="dot"></span>How to Manage Time During College Days | Hindi</a></li><li class="leaf students college hindi"><a href="https://www.youtube.com/watch?v=7ax4Tb5G1P4" target="_blank" rel="noopener"><span class="dot"></span>10 Time Management Frameworks for Productivity | Warikoo (Hindi)</a></li><li class="leaf students college hindi"><a href="https://www.youtube.com/watch?v=kdwA0XMIx8A" target="_blank" rel="noopener"><span class="dot"></span>Time Management Tips for College Students | LIVE (in Hindi)</a></li><li class="leaf students college hindi"><a href="https://www.youtube.com/watch?v=EnHHmV3InD8" target="_blank" rel="noopener"><span class="dot"></span>Time Management for Students | College Life (Hindi)</a></li><li class="leaf students college hindi"><a href="https://www.youtube.com/watch?v=wZ_9mRngt0E" target="_blank" rel="noopener"><span class="dot"></span>College Students के लिए Time Management Tips</a></li><li class="leaf students college hindi"><a href="https://www.youtube.com/watch?v=nh5XbT-4SnI" target="_blank" rel="noopener"><span class="dot"></span>Time Table for College Students | Hindi</a></li><li class="leaf students college hindi"><a href="https://www.youtube.com/watch?v=_W4hxUuJ52I" target="_blank" rel="noopener"><span class="dot"></span>College Students के लिए Best Time Table &amp; Study Plan</a></li><li class="leaf students college hindi"><a href="https://www.youtube.com/watch?v=Y4a3G6UzUbY" target="_blank" rel="noopener"><span class="dot"></span>Time Management Skills for College Success (Hindi)</a></li><li class="leaf students college hindi"><a href="https://www.youtube.com/watch?v=ssNcvO6oUb4" target="_blank" rel="noopener"><span class="dot"></span>Exam Preparation Time Management for College Students | Hindi</a></li><li class="leaf students college hindi"><a href="https://www.youtube.com/watch?v=PQPhbHgJXnQ" target="_blank" rel="noopener"><span class="dot"></span>Productivity &amp; Time Management for Indian Students | Hindi</a></li></ul></details></li></ul></details></li></ul></details></li></ul>
+  </div>
+
+  <footer>Fonts: Oswald (titles), Montserrat (headings), Poppins (body). Colors: Teal #008080, Gray #b4b4b4, Black #000101, White #ffffff.</footer>
+</div>
+
+<script>
+// Build math/science symbol animation
+(function() {
+  const c = document.getElementById('symbols');
+  const ctx = c.getContext('2d');
+  const symbols = ['∑','π','√','∞','∫','Δ','θ','λ','μ','≈','≠','≤','≥','±','→','←','↔','≡','E=mc²','f(x)','H₂O','CO₂','NaCl','⚛︎'];
+  let W,H,items=[];
+
+  function resize() {
+    W = c.width = window.innerWidth;
+    H = c.height = window.innerHeight;
+    const count = Math.min(90, Math.floor((W*H)/18000));
+    items = Array.from({length: count}, () => {
+      const s = symbols[Math.floor(Math.random()*symbols.length)];
+      return {
+        t: s,
+        x: Math.random()*W,
+        y: Math.random()*H,
+        s: 12 + Math.random()*22,
+        a: 0.15 + Math.random()*0.45,
+        vx: (-0.3 + Math.random()*0.6),
+        vy: (-0.2 + Math.random()*0.4),
+        r: Math.random()*Math.PI*2
+      };
+    });
+  }
+
+  function draw() {
+    ctx.clearRect(0,0,W,H);
+    items.forEach(it => {
+      it.x += it.vx;
+      it.y += it.vy;
+      it.r += 0.0025;
+      if (it.x < -50) it.x = W+20;
+      if (it.x > W+50) it.x = -20;
+      if (it.y < -50) it.y = H+20;
+      if (it.y > H+50) it.y = -20;
+
+      ctx.save();
+      ctx.translate(it.x, it.y);
+      ctx.rotate(Math.sin(it.r)*0.15);
+      ctx.globalAlpha = it.a;
+      ctx.fillStyle = '#008080';
+      ctx.font = it.s + 'px Montserrat, Poppins, sans-serif';
+      ctx.fillText(it.t, 0, 0);
+      ctx.restore();
+    });
+    requestAnimationFrame(draw);
+  }
+  window.addEventListener('resize', resize);
+  resize(); draw();
+})();
+
+// Inject icons on summaries
+document.querySelectorAll('.node > details > summary').forEach(s => {
+  const txt = s.textContent.toLowerCase();
+  const i = document.createElement('span');
+  i.className = 'icon folder';
+  if (txt.includes('school')) i.className = 'icon school';
+  if (txt.includes('college')) i.className = 'icon college';
+  if (txt.includes('english')) i.className = 'icon english';
+  if (txt.includes('hindi')) i.className = 'icon hindi';
+  s.prepend(i);
+});
+
+// Search
+const q = document.getElementById('q');
+q.addEventListener('input', () => {
+  const term = q.value.trim().toLowerCase();
+  document.querySelectorAll('.leaf').forEach(li => {
+    const text = li.textContent.toLowerCase();
+    li.style.display = text.includes(term) ? '' : 'none';
+  });
+});
+
+// Expand/Collapse/Reset
+const expandAll = document.getElementById('expandAll');
+const collapseAll = document.getElementById('collapseAll');
+const reset = document.getElementById('reset');
+expandAll.addEventListener('click', () => document.querySelectorAll('details').forEach(d => d.open = true));
+collapseAll.addEventListener('click', () => document.querySelectorAll('details').forEach(d => d.open = false));
+reset.addEventListener('click', () => {
+  q.value='';
+  document.querySelectorAll('.leaf').forEach(li => li.style.display='');
+  document.querySelectorAll('.chip').forEach(ch => ch.classList.remove('active'));
+  document.querySelectorAll('details').forEach(d => d.open = false);
+  document.getElementById('crumbs').innerHTML = 'Time Management <span class="sep">→</span> Students';
+});
+
+// Breadcrumb
+const crumbs = document.getElementById('crumbs');
+document.addEventListener('click', e => {
+  if (e.target.tagName.toLowerCase() === 'summary') {
+    const labels = [];
+    let node = e.target;
+    labels.push(node.textContent.trim());
+    let parent = node.closest('details');
+    while (parent) {
+      const up = parent.parentElement.closest('details');
+      if (up) {
+        const s = up.querySelector(':scope > summary');
+        if (s) labels.push(s.textContent.trim());
+      }
+      parent = up;
+    }
+    labels.reverse();
+    crumbs.innerHTML = 'Time Management <span class="sep">→</span> ' + labels.join(' <span class="sep">→</span> ');
+  }
+});
+
+// Filter chips
+document.querySelectorAll('.chip[data-filter]').forEach(ch => {
+  ch.addEventListener('click', () => {
+    ch.classList.toggle('active');
+    applyFilters();
+  });
+});
+document.getElementById('clearFilters').addEventListener('click', () => {
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  applyFilters();
+});
+
+function applyFilters() {
+  const active = Array.from(document.querySelectorAll('.chip.active')).map(x => x.dataset.filter);
+  const showAll = active.length === 0;
+  document.querySelectorAll('.leaf').forEach(li => {
+    if (showAll) { li.style.display=''; return; }
+    const ok = active.every(tag => li.classList.contains(tag));
+    li.style.display = ok ? '' : 'none';
+  });
+  document.querySelectorAll('.node > details').forEach(d => {
+    if (active.length===0) return;
+    const node = d.closest('.node');
+    const nodeClasses = node ? node.className : '';
+    const matches = active.every(tag => nodeClasses.includes(tag));
+    d.open = matches;
+  });
+}
+</script>
+
+</body>
+</html>
